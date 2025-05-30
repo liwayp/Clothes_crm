@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - {{ order.product_name }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="/">Customers</a></li>
+<li class="breadcrumb-item"><a href="/customers/{{ order.customer.pk }}/">{{ order.customer.name }}</a></li>
+<li class="breadcrumb-item active">Order #{{ order.id }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="bi bi-box"></i> Order #{{ order.id }}
+    </h1>
+    <div>
+        <a href="/customers/{{ order.customer.pk }}/" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Customer
+        </a>
+        <a href="/" class="btn btn-outline-primary">
+            <i class="bi bi-house"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Order Information -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Order Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Order ID:</dt>
+                            <dd class="col-sm-8"><code>#{{ order.id }}</code></dd>
+                            
+                            <dt class="col-sm-4">Product:</dt>
+                            <dd class="col-sm-8"><strong>{{ order.product_name }}</strong></dd>
+                            
+                            <dt class="col-sm-4">Quantity:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-secondary">{{ order.quantity }}</span>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Status:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-{% if order.status == 'New' %}warning{% elif order.status == 'In Progress' %}primary{% else %}success{% endif %} fs-6">
+                                    {{ order.status }}
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Customer:</dt>
+                            <dd class="col-sm-8">
+                                <a href="/customers/{{ order.customer.pk }}/" class="text-decoration-none">
+                                    <strong>{{ order.customer.name }}</strong>
+                                </a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">
+                                <a href="mailto:{{ order.customer.email }}" class="text-decoration-none">
+                                    {{ order.customer.email }}
+                                </a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Phone:</dt>
+                            <dd class="col-sm-8">
+                                {% if order.customer.phone %}
+                                    <a href="tel:{{ order.customer.phone }}" class="text-decoration-none">
+                                        {{ order.customer.phone }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Not provided</span>
+                                {% endif %}
+                            </dd>
+                            
+                            <dt class="col-sm-4">Order Date:</dt>
+                            <dd class="col-sm-8">
+                                {{ order.created_at|date:"F j, Y" }}
+                                <small class="text-muted d-block">{{ order.created_at|time:"g:i A" }}</small>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Status Timeline -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Status
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <span class="badge bg-{% if order.status == 'New' %}warning{% elif order.status == 'In Progress' %}primary{% else %}success{% endif %} fs-5">
+                        {{ order.status }}
+                    </span>
+                </div>
+                
+                <div class="progress mb-3" style="height: 8px;">
+                    <div class="progress-bar bg-{% if order.status == 'New' %}warning{% elif order.status == 'In Progress' %}primary{% else %}success{% endif %}" 
+                         style="width: {% if order.status == 'New' %}33%{% elif order.status == 'In Progress' %}66%{% else %}100%{% endif %}">
+                    </div>
+                </div>
+                
+                <small class="text-muted">
+                    Order created {{ order.created_at|timesince }} ago
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Notes -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-chat-left-text"></i> Notes ({{ order.note_set.count }})
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Existing Notes -->
+        {% if order.note_set.all %}
+            <div class="mb-4">
+                {% for note in order.note_set.all %}
+                <div class="card mb-3 border-start border-primary border-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title mb-0 text-primary">
+                                <i class="bi bi-person-circle"></i> {{ note.author }}
+                            </h6>
+                            <small class="text-muted">
+                                {{ note.created_at|date:"M j, Y g:i A" }}
+                            </small>
+                        </div>
+                        <p class="card-text mb-0">{{ note.text|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> No notes have been added to this order yet.
+            </div>
+        {% endif %}
+
+        <!-- Add Note Form -->
+        <div class="card bg-light">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Add New Note
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.author.id_for_label }}" class="form-label">Author</label>
+                        {{ form.author }}
+                        {% if form.author.errors %}
+                            <div class="text-danger">
+                                {{ form.author.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.text.id_for_label }}" class="form-label">Note</label>
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                            <div class="text-danger">
+                                {{ form.text.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Add any relevant information about this order.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Add Note
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Information Quick Access -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-person"></i> Customer Information
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <p><strong>Name:</strong> {{ order.customer.name }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ order.customer.email }}">{{ order.customer.email }}</a></p>
+                {% if order.customer.phone %}
+                <p><strong>Phone:</strong> <a href="tel:{{ order.customer.phone }}">{{ order.customer.phone }}</a></p>
+                {% endif %}
+                {% if order.customer.address %}
+                <p><strong>Address:</strong> {{ order.customer.address }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <div class="btn-group d-grid gap-2" role="group">
+                    <a href="/customers/{{ order.customer.pk }}/" class="btn btn-outline-primary">
+                        <i class="bi bi-eye"></i> View Customer Details
+                    </a>
+                    <a href="mailto:{{ order.customer.email }}" class="btn btn-outline-success">
+                        <i class="bi bi-envelope"></i> Send Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for timeline and forms */
+.progress {
+    border-radius: 10px;
+}
+
+.card.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.border-start.border-primary.border-3 {
+    border-left-width: 4px !important;
+}
+
+/* Form styling */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+.btn {
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

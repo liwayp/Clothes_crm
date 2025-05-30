@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Order - CloudCRM Fashion{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="/">Customers</a></li>
+<li class="breadcrumb-item active">Add Order</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="bi bi-cart-plus"></i> Create New Order
+    </h1>
+    <div>
+        {% if request.GET.customer %}
+            <a href="/customers/{{ request.GET.customer }}/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Customer
+            </a>
+        {% else %}
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Order Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Display form errors if any -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Customer Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.customer.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i> Customer *
+                                </label>
+                                {{ form.customer }}
+                                {% if form.customer.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.customer.errors }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    Select the customer for this order
+                                    {% if not form.customer.value %}
+                                        <br><a href="/customers/add/" class="text-primary">Add new customer</a> if not in list
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Product Name Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.product_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-box"></i> Product Name *
+                                </label>
+                                {{ form.product_name }}
+                                {% if form.product_name.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.product_name.errors }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Enter the name of the fashion item</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <!-- Quantity Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                    <i class="bi bi-hash"></i> Quantity *
+                                </label>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.quantity.errors }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Number of items to order</div>
+                            </div>
+
+                            <!-- Status Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="bi bi-flag"></i> Status *
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.status.errors }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Current status of the order</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> 
+                                Fields marked with * are required
+                            </small>
+                        </div>
+                        <div>
+                            {% if request.GET.customer %}
+                                <a href="/customers/{{ request.GET.customer }}/" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            {% else %}
+                                <a href="/" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Order
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Fashion Products Suggestions -->
+        <div class="card mt-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-lightbulb"></i> Popular Fashion Items
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Clothing</h6>
+                        <ul class="list-unstyled small">
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Designer Dress</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Casual T-Shirt</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Business Suit</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Evening Gown</button></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Accessories</h6>
+                        <ul class="list-unstyled small">
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Designer Handbag</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Fashion Jewelry</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Luxury Watch</button></li>
+                            <li><button type="button" class="btn btn-link btn-sm p-0 product-suggestion">Designer Shoes</button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Preview -->
+    <div class="col-md-4">
+        <div class="card bg-light sticky-top" style="top: 2rem;">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="bi bi-eye"></i> Order Preview
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <i class="bi bi-cart" style="font-size: 4rem; color: #6c757d;"></i>
+                </div>
+                
+                <div class="preview-info">
+                    <p class="mb-2">
+                        <strong>Customer:</strong><br>
+                        <span id="preview-customer" class="text-muted">Select customer...</span>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Product:</strong><br>
+                        <span id="preview-product" class="text-muted">Enter product name...</span>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Quantity:</strong><br>
+                        <span id="preview-quantity" class="text-muted">Enter quantity...</span>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Status:</strong><br>
+                        <span id="preview-status" class="badge bg-warning">New</span>
+                    </p>
+                </div>
+
+                <hr>
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        Order will be created with today's date
+                    </small>
+                    <div class="mt-2">
+                        <small class="text-primary">
+                            <i class="bi bi-calendar"></i> {{ today|date:"F j, Y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form fields
+    const customerField = document.getElementById('{{ form.customer.id_for_label }}');
+    const productField = document.getElementById('{{ form.product_name.id_for_label }}');
+    const quantityField = document.getElementById('{{ form.quantity.id_for_label }}');
+    const statusField = document.getElementById('{{ form.status.id_for_label }}');
+    
+    // Get preview elements
+    const previewCustomer = document.getElementById('preview-customer');
+    const previewProduct = document.getElementById('preview-product');
+    const previewQuantity = document.getElementById('preview-quantity');
+    const previewStatus = document.getElementById('preview-status');
+
+    // Status badge classes
+    const statusClasses = {
+        'new': 'bg-warning',
+        'in_progress': 'bg-info',
+        'completed': 'bg-success'
+    };
+
+    const statusLabels = {
+        'new': 'New',
+        'in_progress': 'In Progress',
+        'completed': 'Completed'
+    };
+
+    // Update preview function
+    function updatePreview() {
+        // Update customer
+        if (customerField && customerField.selectedOptions.length > 0) {
+            const selectedOption = customerField.selectedOptions[0];
+            previewCustomer.textContent = selectedOption.text !== '--------' ? selectedOption.text : 'Select customer...';
+            previewCustomer.className = selectedOption.text !== '--------' ? 'text-dark' : 'text-muted';
+        }
+
+        // Update product
+        if (productField && productField.value.trim()) {
+            previewProduct.textContent = productField.value;
+            previewProduct.className = 'text-dark';
+        } else {
+            previewProduct.textContent = 'Enter product name...';
+            previewProduct.className = 'text-muted';
+        }
+
+        // Update quantity
+        if (quantityField && quantityField.value) {
+            previewQuantity.textContent = quantityField.value + ' items';
+            previewQuantity.className = 'text-dark';
+        } else {
+            previewQuantity.textContent = 'Enter quantity...';
+            previewQuantity.className = 'text-muted';
+        }
+
+        // Update status
+        if (statusField && statusField.value) {
+            const status = statusField.value;
+            previewStatus.textContent = statusLabels[status] || status;
+            previewStatus.className = 'badge ' + (statusClasses[status] || 'bg-secondary');
+        }
+    }
+
+    // Add event listeners
+    if (customerField) customerField.addEventListener('change', updatePreview);
+    if (productField) productField.addEventListener('input', updatePreview);
+    if (quantityField) quantityField.addEventListener('input', updatePreview);
+    if (statusField) statusField.addEventListener('change', updatePreview);
+
+    // Product suggestions functionality
+    const productSuggestions = document.querySelectorAll('.product-suggestion');
+    productSuggestions.forEach(function(button) {
+        button.addEventListener('click', function() {
+            if (productField) {
+                productField.value = this.textContent;
+                updatePreview();
+                productField.focus();
+            }
+        });
+    });
+
+    // Initial preview update
+    updatePreview();
+
+    // Pre-select customer if passed in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const customerId = urlParams.get('customer');
+    if (customerId && customerField) {
+        customerField.value = customerId;
+        updatePreview();
+    }
+});
+</script>
+
+<style>
+.product-suggestion:hover {
+    text-decoration: underline !important;
+}
+
+.sticky-top {
+    position: sticky;
+}
+
+.card.shadow {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.form-control, .form-select {
+    border-radius: 0.375rem;
+}
+
+.btn {
+    border-radius: 0.375rem;
+}
+
+.preview-info p {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+.preview-info p:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+</style>
+{% endblock %}
